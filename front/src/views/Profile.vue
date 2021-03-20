@@ -12,12 +12,17 @@
 <script>
 import vueDropzone from "vue2-dropzone";
 import "vue2-dropzone/dist/vue2Dropzone.min.css";
+import { UPLOAD_URL } from "@/api/endpoints";
+import api from "@/api/api";
 
 export default {
   data: () => ({
     currentFile: null,
     dropOptions: {
-      url: "https://httpbin1.org/post",
+      url: UPLOAD_URL,
+      headers: {
+        ...api.headers,
+      },
       maxFiles: 2,
       thumbnailWidth: 200,
     },
