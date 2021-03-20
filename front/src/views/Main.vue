@@ -2,7 +2,17 @@
   <v-container class="login-page d-flex align-center justify-center">
     <v-card max-width="360" width="100%">
       <v-container>
-        <h1>login form</h1>
+        <v-form @submit.prevent="onSubmit">
+          <v-text-field v-model="login" label="Login" required outlined />
+          <v-text-field
+            v-model="password"
+            type="password"
+            label="Password"
+            required
+            outlined
+          />
+          <v-btn block type="submit"> Login </v-btn>
+        </v-form>
       </v-container>
     </v-card>
   </v-container>
@@ -13,13 +23,23 @@
 
 export default {
   name: "LoginPage",
+  data() {
+    return {
+      login: "",
+      password: "",
+    };
+  },
   components: {},
+  methods: {
+    onSubmit() {
+      console.log("submit", { login: this.login, password: this.password });
+    },
+  },
 };
 </script>
 
 <style lang="scss">
 .login-page {
   min-height: 100%;
-  background-color: lightgray;
 }
 </style>
