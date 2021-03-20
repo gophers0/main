@@ -20,11 +20,32 @@
               <h2>My files</h2>
             </v-expansion-panel-header>
             <v-expansion-panel-content>
-              <p>file</p>
-              <p>file</p>
-              <p>file</p>
-              <p>file</p>
-              <p>file</p>
+              <v-list subheader two-line>
+                <v-list-item v-for="file in myFileList" :key="file.title" class="pa-0">
+                  <v-list-item-avatar>
+                    <v-icon class="grey lighten-1" dark> {{ file.icon }} </v-icon>
+                  </v-list-item-avatar>
+
+                  <v-list-item-content>
+                    <v-list-item-title v-text="file.title"></v-list-item-title>
+
+                    <v-list-item-subtitle
+                      v-text="file.subtitle"
+                    ></v-list-item-subtitle>
+                  </v-list-item-content>
+
+                  <v-list-item-action>
+                    <v-btn icon>
+                      <v-icon color="grey lighten-1">mdi-delete</v-icon>
+                    </v-btn>
+                  </v-list-item-action>
+                  <v-list-item-action class="ml-1">
+                    <v-btn icon>
+                      <v-icon color="grey lighten-1">mdi-information</v-icon>
+                    </v-btn>
+                  </v-list-item-action>
+                </v-list-item>
+              </v-list>
             </v-expansion-panel-content>
           </v-expansion-panel>
         </v-expansion-panels>
@@ -58,6 +79,10 @@ import api from "@/api/api";
 
 export default {
   data: () => ({
+    myFileList: [
+      { title: "ava43-dfsdfs-dfsssss-sdfsdfs dffdsf.png", subtitle: "34kB, 22.05.1999", icon: "mdi-image" },
+      { title: "sea77.mp4", subtitle: "1255kB, 22.05.1977", icon: "mdi-file" },
+    ],
     myFilePanel: 0,
     myLinkPanel: 1,
     currentFile: null,
