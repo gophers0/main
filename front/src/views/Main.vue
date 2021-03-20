@@ -19,8 +19,6 @@
 </template>
 
 <script>
-// @ is an alias to /src
-
 export default {
   name: "LoginPage",
   data() {
@@ -31,8 +29,14 @@ export default {
   },
   components: {},
   methods: {
-    onSubmit() {
-      console.log("submit", { login: this.login, password: this.password });
+    async onSubmit() {
+      await this.$store.dispatch("login", {
+        login: this.login,
+        password: this.password,
+      });
+      if (this.$store.state.user) {
+        await this.$router.push("/profile");
+      }
     },
   },
 };

@@ -39,5 +39,11 @@ export default {
   data: () => ({
     //
   }),
+  mounted() {
+    // const token = localStorage.token;
+    // if (token) {
+    //   this.$store.dispatch("fetchUser", token);
+    // }
+  },
 };
 </script>
