@@ -11,15 +11,15 @@ const routes = [
     name: "Login",
     component: Main,
     meta: { requiresAuth: false },
-    beforeEnter: (to, from, next) => {
-      if (store.getters.user) {
-        next({
-          path: "/profile",
-        });
-      } else {
-        next();
-      }
-    },
+    // beforeEnter: (to, from, next) => {
+    //   if (store.getters.user) {
+    //     next({
+    //       path: "/profile",
+    //     });
+    //   } else {
+    //     next();
+    //   }
+    // },
   },
   {
     path: "/profile",
@@ -47,10 +47,11 @@ router.beforeEach(async (to, from, next) => {
   const loggedIn = !!user;
   if (to.matched.some((record) => record.meta.requiresAuth)) {
     if (!loggedIn) {
-      next({
-        path: "/",
-        // query: { redirect: to.fullPath },
-      });
+      next();
+      // next({
+      //   path: "/",
+      //   // query: { redirect: to.fullPath },
+      // });
     } else {
       next();
     }
