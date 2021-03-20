@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>Title</title>
+    <style>
+        body {
+            font-family: Tahoma, serif;
+        }
+        .header {
+            width: 100%;
+            height: 50px;
+            border-bottom: solid 1px #011628;
+        }
+        .header #logo {
+            float: left;
+            height: 50px;
+        }
+        .header .slogo {
+            float: left;
+            padding-top: 23px;
+        }
+        .header .slogo div {
+            padding-bottom: 20px;
+        }
+        .header .auth {
+            float: right;
+            padding-top: 9px;
+        }
+        @media (max-width: 320px) {
+            .header .slogo {
+                display: none;
+            }
+        }
+    </style>
+    <script src="js/jquery.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            var user = JSON.parse(localStorage.getItem("user"));
+            var token = localStorage.getItem("token");
+            if (token == null || user == null) {
+                window.location.href = 'index.html';
+                return
+            }
+
+            $('.header .login').html(user.login)
+        });
+    </script>
+</head>
+<body>
+<div class="header">
+    <img id="logo" src="img/logo_small.png"/>
+    <div class="slogo">
+        <div>
+            Your personal storage
+        </div>
+    </div>
+    <div class="auth">
+        <span class="login"></span>
+        (<a href="#">Выйти</a>)
+    </div>
+</div>
+
+</body>
+</html>

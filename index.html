@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="css/login.css"/>
+    <script src="js/jquery.min.js"></script>
+    <title>Title</title>
+</head>
+<script>
+    var baseUrl = '//localhost:3000/'
+    $(document).ready(function () {
+        var user = localStorage.getItem("user");
+        var token = localStorage.getItem("token");
+        if (user !== null && token !== null) {
+            // check token
+            user = JSON.parse(user);
+            $.ajax({
+                url: baseUrl + 'auth/checkToken',
+                type: 'POST',
+                headers: {
+                    'Authorization': user.id + ':' + token,
+                    'Content-type': 'application/json'
+                },
+                dataType: 'json',
+                data: JSON.stringify({
+                    user_id: user.id,
+                    token: token,
+                }),
+                success: function (r) {
+                    console.log(r)
+                    window.location.href = 'profile.html'
+                },
+                error: function (e) {
+                    console.log('error', e);
+                }
+            })
+        }
+    });
+
+    function loginSubmit() {
+        $('.button-submit').attr("disable", true);
+        $.ajax({
+            type: 'POST',
+            url: baseUrl + 'auth/login',
+            data: {login: $('#login-field').val(), password: $('#password-field').val()},
+            success: function (r) {
+                if (r.code === 0) {
+                    localStorage.setItem("user", JSON.stringify(r.user))
+                    localStorage.setItem("token", r.token)
+                    $('.button-submit').attr("disable", false);
+                    // redirect here
+                    window.location.href = 'profile.html'
+                } else {
+                    console.log('bad response', r)
+                }
+            },
+            error: function (e) {
+                console.log('Error', e)
+                $('.button-submit').attr("disable", false);
+            }
+        })
+    }
+</script>
+<body>
+<div class="form-container">
+    <form id="login-form" method="post" onsubmit="loginSubmit();return false">
+        <img id="logo" src="img/logo_small.png"/>
+        <div class="row">
+            <input type="text" id="login-field" placeholder="Login" name="login"/>
+        </div>
+        <div class="row">
+            <input type="password" id="password-field" placeholder="Password" name="password"/>
+        </div>
+        <div class="row right">
+            <input class="button-submit" type="submit"/>
+        </div>
+    </form>
+</div>
+
+</body>
+</html>
