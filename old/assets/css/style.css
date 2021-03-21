@@ -1919,3 +1919,10 @@ section {
   right: 10px;
   width: 300px;
 }
+.previewIcon {
+  display: block;
+  text-align:center;
+}
+.previewIcon i {
+  font-size: 70px;
+}

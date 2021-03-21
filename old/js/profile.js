@@ -31,6 +31,29 @@ function getAuthToken() {
     return "";
 }
 
+function getPreviewIcon(type) {
+    switch (type) {
+        case 'application/xhtml+xml':
+        case 'application/vnd.ms-excel':
+        case 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
+            return '<i class="ri-file-excel-2-line"></i>';
+        case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
+        case 'application/msword':
+            return '<i class="ri-file-word-2-line"></i>';
+        case 'application/pdf':
+            return '<i class="ri-file-pdf-line"></i>';
+        case 'image/gif':
+        case 'image/jpeg':
+        case 'image/pjpeg':
+        case 'image/png':
+        case 'image/svg+xml':
+        case 'image/webp':
+            return '<i class="ri-image-2-line"></i>';
+        default:
+            return '<i class="ri-file-2-line"></i>';
+    }
+}
+
 function renderMyFiles(files) {
     $('#myFiles').html('');
     if (files.length === 0) {
@@ -38,7 +61,7 @@ function renderMyFiles(files) {
     }
     files.forEach(function (e) {
         var fileContainer = $('<div class="card" style="width: 18rem;"></div>');
-        fileContainer.append('<img src="' + e.preview + '" class="card-img-top" alt="preview"/>')
+        fileContainer.append('<div class="previewIcon">' + getPreviewIcon(e.mime) + '</div>')
         var body = $('<div class="card-body"></div>');
         body.append('<h5 class="card-title">' + e.name + '</h5>')
         body.append('<p class="card-text">Загружен: ' + (new Date(e.created_at)).toLocaleString("ru-RU") + '</p>')
