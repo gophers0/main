@@ -1,66 +1,218 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1"/>
-    <title>Title</title>
-    <style>
-        body {
-            font-family: Tahoma, serif;
-        }
-        .header {
-            width: 100%;
-            height: 50px;
-            border-bottom: solid 1px #011628;
-        }
-        .header #logo {
-            float: left;
-            height: 50px;
-        }
-        .header .slogo {
-            float: left;
-            padding-top: 23px;
-        }
-        .header .slogo div {
-            padding-bottom: 20px;
-        }
-        .header .auth {
-            float: right;
-            padding-top: 9px;
-        }
-        @media (max-width: 320px) {
-            .header .slogo {
-                display: none;
-            }
-        }
-    </style>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+    <title>G+0 file storage</title>
+    <meta content="" name="description">
+    <meta content="" name="keywords">
+
+    <link href="assets/img/favicon.png" rel="icon">
+    <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+    <link href="assets/vendor/aos/aos.css" rel="stylesheet">
+    <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    <link href="assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+    <link href="assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+    <link href="assets/vendor/remixicon/remixicon.css" rel="stylesheet">
+    <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+
+    <link href="assets/css/style.css" rel="stylesheet">
     <script src="js/jquery.min.js"></script>
+    <script src="js/profile.js"></script>
+    <script src="js/auth.js"></script>
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
             var user = JSON.parse(localStorage.getItem("user"));
             var token = localStorage.getItem("token");
             if (token == null || user == null) {
                 window.location.href = 'index.html';
                 return
             }
+            checkToken(user.id, token)
+            user = JSON.parse(localStorage.getItem("user"));
+            if (user.role === "admin") {
+                $('<li><a class="nav-link" href="admin.html">CMS</a></li>').insertBefore('li:first');
+            }
+            $('.header .login').html(user.login);
+            getProfile();
+            var dropZone = $('#drop-area');
+            dropZone[0].ondragover = function() {
+                dropZone.addClass('hover');
+                return false;
+            };
 
-            $('.header .login').html(user.login)
+            dropZone[0].ondragleave = function() {
+                dropZone.removeClass('hover');
+                return false;
+            };
+
+            dropZone[0].ondrop = function(event) {
+                event.preventDefault();
+                dropZone.removeClass('hover');
+                dropZone.addClass('drop');
+                upload_file(event.dataTransfer.files)
+            };
         });
     </script>
 </head>
+
 <body>
-<div class="header">
-    <img id="logo" src="img/logo_small.png"/>
-    <div class="slogo">
-        <div>
-            Your personal storage
+
+<header id="header" class="fixed-top">
+    <div class="container d-flex align-items-center justify-content-between">
+
+        <h1 class="logo">
+            <a href="profile.html"><img src="img/logo_small.png" class="img-fluid"/></a>
+        </h1>
+
+        <nav id="navbar" class="navbar">
+            <ul>
+                <li><a class="nav-link scrollto active" href="#hero">Загрузить файлы</a></li>
+                <li><a class="nav-link scrollto" href="#about">Мои файлы</a></li>
+                <li><a class="nav-link scrollto" href="#services">Доступные мне</a></li>
+                <li><a class="nav-link scrollto" href="#testimonials">Корзина</a></li>
+
+
+                <li><a class="getstarted" onclick="logout();return false;">Выйти</a></li>
+            </ul>
+            <i class="bi bi-list mobile-nav-toggle"></i>
+        </nav>
+
+    </div>
+</header>
+
+<section id="hero" class="d-flex align-items-center">
+    <div class="container position-relative" data-aos="fade-up" data-aos-delay="100">
+        <form id="drop-area" method="post" onsubmit="upload_file(); return false;" enctype="multipart/form-data">
+            <div class="row justify-content-center">
+                <div class="col-xl-7 col-lg-9 text-center">
+                    <h1>Перетащите файл сюда</h1>
+                    <h2>и он автоматически загрузится в ваше пространство</h2>
+                </div>
+            </div>
+            <div class="text-center">
+                <input type="file" onchange="upload_file()" name="file" id="file" style="display:none">
+                <a href="#" onclick="$('#file').click()" class="btn-get-started">Загрузить</a>
+            </div>
+        </form>
+
+        <div class="row icon-boxes">
+            <div class="col-md-6 col-lg-3 d-flex align-items-stretch mb-5 mb-lg-0" data-aos="zoom-in" data-aos-delay="200">
+                <div class="icon-box">
+                    <div class="icon">
+                        <i class="ri-cloud-line"></i>
+                        <span id="disk_size"></span>
+                    </div>
+                    <h4 class="title"><a href="">Объем пространства</a></h4>
+                    <p class="description"></p>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3 d-flex align-items-stretch mb-5 mb-lg-0" data-aos="zoom-in" data-aos-delay="300">
+                <div class="icon-box">
+                    <div class="icon">
+                        <i class="ri-hard-drive-2-fill"></i>
+                        <span id="disk_filled"></span>
+                    </div>
+                    <h4 class="title"><a href="">Занято пространства</a></h4>
+                    <p class="description"></p>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3 d-flex align-items-stretch mb-5 mb-lg-0" data-aos="zoom-in" data-aos-delay="400">
+                <div class="icon-box">
+                    <div class="icon">
+                        <i class="ri-hard-drive-2-line"></i>
+                        <span id="disk_free"></span>
+                    </div>
+                    <h4 class="title"><a href="">Свободно пространства</a></h4>
+                    <p class="description">&nbsp;</p>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3 d-flex align-items-stretch mb-5 mb-lg-0" data-aos="zoom-in" data-aos-delay="500">
+                <div class="icon-box">
+                    <div class="icon">
+                        <i class="ri-file-line"></i>
+                        <span id="disk_files_count"></span>
+                    </div>
+                    <h4 class="title"><a href="">Загруженых файлов</a></h4>
+                    <p class="description">&nbsp;</p>
+                </div>
+            </div>
+
         </div>
     </div>
-    <div class="auth">
-        <span class="login"></span>
-        (<a href="#">Выйти</a>)
+</section>
+
+<main id="main">
+    <section id="about" class="about">
+        <div class="container" data-aos="fade-up">
+            <div class="section-title">
+                <h2>Мои файлы</h2>
+                <p>Ранее загруженные файлы. </p>
+            </div>
+            <div class="row content" id="myFiles"></div>
+        </div>
+    </section>
+
+    <section id="testimonials" class="testimonials">
+        <div class="container" data-aos="fade-up">
+
+            <div class="section-title">
+                <h2>Корзина</h2>
+                <p>Ранее удаленные файлы. Они со временем удалять, либо можно очистить корзину вручную</p>
+            </div>
+
+            <div class="row" id="trash-items">Ваша корзина пуста</div>
+        </div>
+    </section>
+
+    <section id="services" class="services section-bg">
+        <div class="container" data-aos="fade-up">
+
+            <div class="section-title">
+                <h2>Доступные мне</h2>
+                <p>Файлы, которыми поделились с Вами другие пользователи</p>
+            </div>
+
+            <div class="row" id="shared_files"></div>
+        </div>
+    </section>
+
+</main>
+
+<footer id="footer">
+    <div class="container d-md-flex py-4">
+        <div class="me-md-auto text-center text-md-start">
+            <div class="copyright">
+                &copy; Copyright <strong><span>G+0 team</span></strong>. All Rights Reserved
+            </div>
+        </div>
+        <div class="social-links text-center text-md-right pt-3 pt-md-0">
+            <a target="_blank" href="https://vk.com/zergular"><i class="bx bxl-vk"></i></a>
+            <a target="_blank" href="https://github.com/zergu1ar"><i class="bx bxl-github"></i></a>
+            <a target="_blank" href="https://www.linkedin.com/in/zergular/" class="linkedin"><i class="bx bxl-linkedin"></i></a>
+        </div>
     </div>
-</div>
+</footer>
+
+<div id="preloader"></div>
+<a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+
+<script src="assets/vendor/aos/aos.js"></script>
+<script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
+<script src="assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
+<script src="assets/vendor/php-email-form/validate.js"></script>
+<script src="assets/vendor/purecounter/purecounter.js"></script>
+<script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
+<script src="assets/js/main.js"></script>
 
 </body>
+
 </html>
